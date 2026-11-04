@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tarun RG · Senior creative lead · The ride</title>
+<meta name="description" content="Ride through Tarun RG's story, Chennai to Ladakh: senior creative lead at YAAS, builder of NRI Shaala, motorcycle storyteller. Let's work together.">
+<meta name="theme-color" content="#F4ECDD">
+<meta property="og:title" content="Tarun RG · The ride">
+<meta property="og:description" content="A side scrolling graphic novel portfolio. Chennai to Ladakh, and what's next.">
+<meta property="og:image" content="https://tarungiriraj.github.io/odyssey/img/og.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%238E1B2B' stroke='%231D1A1F' stroke-width='4'/%3E%3Ctext x='32' y='42' font-size='26' text-anchor='middle' fill='%23F4ECDD' font-family='Georgia' font-weight='700'%3ETR%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+<script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+<a class="skip" href="#list" data-open-list>Skip to the end · view as a list</a>
+
+<div id="game" aria-label="Side scrolling journey">
+  <canvas id="world" aria-hidden="true"></canvas>
+
+  <header class="hud" aria-label="Journey progress">
+    <div class="hud-row">
+      <a class="mono" href="#top" aria-label="Tarun RG, back to start" data-goto="-1"><span>TR</span></a>
+      <div class="who"><strong>Tarun RG</strong><span>Senior creative lead</span></div>
+      <div class="odo" aria-label="Odometer"><span class="odo-num" id="odo">0000</span><span class="odo-unit">km</span></div>
+      <button class="icon-btn" id="sound" aria-pressed="false" aria-label="Sound off. Turn sound on">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="mute" d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn" data-open-list aria-label="View as a list">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>
+      </button>
+    </div>
+    <div class="hud-row badges-row">
+      <ol class="badges" id="badges" aria-label="Stops"></ol>
+      <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+    </div>
+  </header>
+
+  <section class="intro" id="intro" aria-labelledby="intro-title">
+    <p class="kicker">A graphic novel journey · 2018 to now</p>
+    <h1 id="intro-title">Tarun RG</h1>
+    <p class="sub">Senior creative lead · Bangalore<br>Stories, community &amp; two wheels</p>
+    <button class="cta" id="start">Swipe or press → to ride</button>
+    <button class="link-btn" data-open-list>View as a list</button>
+  </section>
+
+  <div id="cards"></div>
+
+  <div class="controls">
+    <button class="ctl" id="back" aria-label="Ride back to the previous stop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <p class="hint" id="hint">Scroll, swipe or hold → to ride</p>
+    <button class="ctl ctl-go" id="fwd" aria-label="Ride to the next stop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <p class="sr-only" aria-live="polite" id="live"></p>
+</div>
+<div id="track" aria-hidden="true"></div>
+
+<div class="list" id="list" role="dialog" aria-modal="true" aria-labelledby="list-title" tabindex="-1">
+  <div class="list-inner">
+    <div class="list-head">
+      <h2 id="list-title">Tarun RG · the whole ride</h2>
+      <button class="cta small" data-close-list>Back to the ride</button>
+    </div>
+    <p class="list-sub">Senior creative lead at YAAS, Bangalore. Stories, community &amp; two wheels.</p>
+    <div id="list-items">
+<article class="item"><img alt="Tarun outside his engineering college in Chennai at sunrise" width="1280" height="858" loading="lazy" decoding="async" src="img/s1-960.webp"><div class="body"><p class="eyebrow">Stop 01 · Chennai, Tamil Nadu · 2018 to 2022</p><h3>Solaris days</h3><div class="story"><p>Electrical engineering at Sri Sairam Engineering College, Chennai by day, garage nights leading the Solaris solar car team.</p><p>We built a car that ran on sunlight and stubbornness, and took it all the way to the national podium.</p></div><div class="stat"><b>#2</b><span>national runner-up, two years running</span></div><div class="links"><a class="chip" href="https://www.linkedin.com/in/tarunrg/" target="_blank" rel="noopener"><span>Full résumé on LinkedIn</span></a></div></div></article>
+<article class="item"><img alt="Tarun at his desk in a glass office" width="1280" height="858" loading="lazy" decoding="async" src="img/s2-960.webp"><div class="body"><p class="eyebrow">Stop 02 · Guardian India · 2022 to 2024</p><h3>The desk job era</h3><div class="story"><p>SQL developer at Guardian India by day: queries, dashboards and clean data.</p><p>Freelance UX for an automotive community app and brand strategy on the side. The creative itch never left.</p></div><div class="stat"><b>25%</b><span>fewer incidents</span></div><div class="links"><a class="chip" href="https://www.linkedin.com/in/tarunrg/" target="_blank" rel="noopener"><span>Full résumé on LinkedIn</span></a></div></div></article>
+<article class="item"><img alt="Tarun on stage at a creative event" width="1280" height="858" loading="lazy" decoding="async" src="img/s3-960.webp"><div class="body"><p class="eyebrow">Stop 03 · Marketing head at Become · 2024</p><h3>Picking the creative lane</h3><div class="story"><p>Joined Become as marketing head and created Possibilities Fest. Swapped query plans for campaign plans.</p><p>Picked up a bicycle and a brand new job description. First time the internet felt like a workplace.</p></div><div class="stat"><b>65%</b><span>more engagement</span></div><div class="links"><a class="chip" href="https://www.linkedin.com/in/tarunrg/" target="_blank" rel="noopener"><span>Full résumé on LinkedIn</span></a></div></div></article>
+<article class="item"><img alt="Tarun on his motorcycle in Bangalore at dusk, a film set behind him" width="1280" height="858" loading="lazy" decoding="async" src="img/s4-960.webp"><div class="body"><p class="eyebrow">Stop 04 · Bangalore · YAAS · 2025 to now</p><h3>NRI Shaala rising</h3><div class="story"><p>Script writer to senior creative lead in 18 months, leading a team of 10+ in the middle of Bangalore.</p><p>Built NRI Shaala from 0 to 200K followers.</p></div><div class="stat"><b>200K</b><span>followers, 0 → 200K combined</span></div><div class="links"><a class="chip" href="https://www.instagram.com/nrishaala/" target="_blank" rel="noopener"><span>NRI Shaala · Instagram</span></a><a class="chip" href="https://www.youtube.com/@NRIShaala" target="_blank" rel="noopener"><span>NRI Shaala · YouTube</span></a><a class="chip" href="https://www.yaasmedia.com/" target="_blank" rel="noopener"><span>YAAS</span></a></div></div></article>
+<article class="item"><img alt="A comic studio wall of shows Tarun has built" width="1280" height="858" loading="lazy" decoding="async" src="img/s5-960.webp"><div class="body"><p class="eyebrow">Stop 05 · Full Disclosure &amp; more · YAAS originals</p><h3>Building IPs full time</h3><div class="story"><p>Alongside NRI Shaala: IPs like Full Disclosure and FinCredibles, the One8 launch campaign, plus work for Zerodha and Jio Financial.</p><p>Right now we're building What the Wallet, a brand new IP for CRED.</p></div><div class="stat"><b>4</b><span>IPs built &amp; counting</span></div><div class="links"><a class="chip" href="https://www.youtube.com/channel/UCf_XYgupvdx7rA44Ap3uI5w" target="_blank" rel="noopener"><span>Full Disclosure</span></a><a class="chip" href="https://www.instagram.com/the.fincredibles/" target="_blank" rel="noopener"><span>FinCredibles</span></a><a class="chip" href="https://www.instagram.com/one8world/" target="_blank" rel="noopener"><span>One8</span></a><a class="chip" href="https://www.youtube.com/@whatthewallet" target="_blank" rel="noopener"><span>What the Wallet</span></a></div></div></article>
+<article class="item"><img alt="Tarun riding his Himalayan through green hills" width="1280" height="858" loading="lazy" decoding="async" src="img/s6-960.webp"><div class="body"><p class="eyebrow">Stop 06 · On the road · Highways &amp; hills</p><h3>Two wheels, one lens</h3><div class="story"><p>Motorcycle travel films from the highways I ride, shot on the go and cut at midnight.</p><p>The road became my favourite storyboard.</p></div><div class="links"><a class="chip primary" href="https://www.youtube.com/@tarungiriraj" target="_blank" rel="noopener"><span>Watch the films</span></a><a class="chip" href="https://www.instagram.com/tarungiriraj/" target="_blank" rel="noopener"><span>Instagram</span></a></div></div></article>
+<article class="item"><img alt="Tarun on a high Ladakh pass with snow peaks and prayer flags" width="1280" height="858" loading="lazy" decoding="async" src="img/s7-960.webp"><div class="body"><p class="eyebrow">Stop 07 · Ladakh · The high pass</p><h3>The ride that changed everything</h3><div class="story"><p>Rode to Ladakh: snow, switchbacks, silence, and air thin enough to hear yourself think.</p><p>It changed how I tell stories. Some roads don't just take you places; they rewrite you.</p></div><div class="links"><a class="chip" href="https://www.youtube.com/@tarungiriraj" target="_blank" rel="noopener"><span>Ride along on YouTube</span></a></div></div></article>
+<article class="item"><img alt="Tarun's motorcycle parked at night beside a glowing route map" width="1280" height="858" loading="lazy" decoding="async" src="img/s8-960.webp"><div class="body"><p class="eyebrow">Stop 08 · Now building · GearTribe</p><h3>GearTribe</h3><div class="story"><p>Live group ride tracking for riders, so the pack never loses its own.</p><p>Currently building it ride by ride, feedback loop by feedback loop.</p></div><div class="links"><a class="chip primary" href="https://geartribe.sites.tab.bot/" target="_blank" rel="noopener"><span>Open GearTribe</span></a></div></div></article>
+<article class="item"><div class="body"><p class="eyebrow">Next stop</p><h3>Next stop: let's work together</h3><div class="story"><p>The road ahead is open. If you're building something that needs stories people actually remember, let's ride.</p><p>I bring the narratives, the community, and the throttle.</p></div><div class="links"><a class="chip primary" href="mailto:itsmetarun2606@gmail.com"><span>Email me</span></a><a class="chip primary" href="https://www.linkedin.com/in/tarunrg/" target="_blank" rel="noopener"><span>LinkedIn</span></a><a class="chip" href="https://www.youtube.com/@tarungiriraj" target="_blank" rel="noopener"><span>YouTube</span></a><a class="chip" href="https://www.instagram.com/tarungiriraj/" target="_blank" rel="noopener"><span>Instagram</span></a></div></div></article>
+</div>
+    <!--/list-->
+  </div>
+</div>
+
+<noscript><style>.list{display:block!important;position:static!important;opacity:1!important}#game,#track,.skip{display:none}</style></noscript>
+<script src="data.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
