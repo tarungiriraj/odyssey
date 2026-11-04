@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=snd1">
 <script>document.documentElement.classList.add('js')</script>
 </head>
 <body>
@@ -23,14 +23,18 @@
 
 <div id="game" aria-label="Side scrolling journey">
   <canvas id="world" aria-hidden="true"></canvas>
+  <div id="tint" aria-hidden="true"></div>
 
   <header class="hud" aria-label="Journey progress">
     <div class="hud-row">
       <a class="mono" href="#top" aria-label="Tarun RG, back to start" data-goto="-1"><span>TR</span></a>
       <div class="who"><strong>Tarun RG</strong><span>Senior creative lead</span></div>
       <div class="odo" aria-label="Odometer"><span class="odo-num" id="odo">0000</span><span class="odo-unit">km</span></div>
-      <button class="icon-btn" id="sound" aria-pressed="false" aria-label="Sound off. Turn sound on">
+      <button class="icon-btn" id="sound" aria-pressed="true" aria-label="Music on. Turn music off">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="mute" d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn" id="tune" aria-expanded="false" aria-controls="sndpanel" aria-label="Sound settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M5 17h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="2.6" fill="#FBF6EC" stroke="currentColor" stroke-width="2"/><circle cx="15" cy="17" r="2.6" fill="#FBF6EC" stroke="currentColor" stroke-width="2"/></svg>
       </button>
       <button class="icon-btn" data-open-list aria-label="View as a list">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/></svg>
@@ -46,10 +50,24 @@
     <p class="kicker">A graphic novel journey · 2018 to now</p>
     <h1 id="intro-title">Tarun RG</h1>
     <p class="sub">Senior creative lead · Bangalore<br>Stories, community &amp; two wheels</p>
-    <button class="cta" id="start">Swipe or press → to ride</button>
+    <button class="cta" id="start">Tap to ride →</button>
+    <p class="sound-note">Music and sound effects start with your first tap. Mute any time with the speaker button.</p>
     <button class="link-btn" data-open-list>View as a list</button>
   </section>
 
+
+  <section class="sndpanel" id="sndpanel" role="dialog" aria-label="Sound settings" hidden>
+    <div class="sp-head"><strong>Music &amp; sound</strong><button class="sp-x" id="sp-close" aria-label="Close sound settings">&times;</button></div>
+    <button class="sp-master" id="sp-master" aria-pressed="true"><span class="sp-dot" aria-hidden="true"></span><span id="sp-master-t">Music is on. Tap to turn off</span></button>
+    <label class="sp-row" for="sp-music"><span>Soundtrack</span>
+      <select id="sp-music">
+        <option value="auto">Auto, by place</option><option value="chennai">Chennai</option><option value="bangalore">Bangalore</option><option value="ladakh">Ladakh</option><option value="highway">Highway</option><option value="geartribe">GearTribe night</option><option value="golden">Golden road</option><option value="morning">Morning</option><option value="evening">Evening</option><option value="off">Music off</option>
+      </select></label>
+    <div class="sp-row"><span id="sp-tod-l">Time of day</span>
+      <div class="sp-seg" role="group" aria-labelledby="sp-tod-l"><button id="sp-morning" aria-pressed="true">Morning</button><button id="sp-evening" aria-pressed="false">Evening</button></div></div>
+    <label class="sp-row" for="sp-mvol"><span>Music volume</span><input type="range" id="sp-mvol" min="0" max="100" value="70"></label>
+    <p class="sp-note">Sound effects are always on. Everything is synthesized in your browser, no audio files. Press M to mute music.</p>
+  </section>
   <div id="cards"></div>
 
   <div class="controls">
@@ -84,7 +102,8 @@
 </div>
 
 <noscript><style>.list{display:block!important;position:static!important;opacity:1!important}#game,#track,.skip{display:none}</style></noscript>
-<script src="data.js"></script>
-<script src="game.js"></script>
+<script src="data.js?v=snd1"></script>
+<script src="audio.js?v=snd1"></script>
+<script src="game.js?v=snd1"></script>
 </body>
 </html>

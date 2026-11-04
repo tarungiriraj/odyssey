@@ -484,11 +484,54 @@
   });
   function loadImg(i) { if (i < 0 || i >= N) return; var img = cards[i].querySelector("img[data-src]"); if (img) { img.srcset = img.getAttribute("data-srcset"); img.src = img.getAttribute("data-src"); img.removeAttribute("data-src"); } }
 
-  /* ---------- sound (muted by default) ---------- */
-  var soundOn = false, actx = null, soundBtn = document.getElementById("sound");
-  soundBtn.addEventListener("click", function () { soundOn = !soundOn; soundBtn.setAttribute("aria-pressed", String(soundOn)); soundBtn.setAttribute("aria-label", soundOn ? "Sound on. Turn sound off" : "Sound off. Turn sound on"); if (soundOn) { try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); actx.resume(); chime(); } catch (e) { soundOn = false; } } });
-  function tone(f, t0, d, v) { var o = actx.createOscillator(), g = actx.createGain(); o.type = "sine"; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(v, t0 + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d); o.connect(g); g.connect(actx.destination); o.start(t0); o.stop(t0 + d + 0.05); }
-  function chime() { if (!soundOn || !actx) return; var t = actx.currentTime; tone(659.25, t, 0.5, 0.12); tone(987.77, t + 0.11, 0.7, 0.09); }
+  /* ---------- sound: procedural layer in audio.js. Music is ON by default and starts with the first tap/key (browsers need a gesture); effects are always on ---------- */
+  var AU = null, unlocked = false, soundBtn = document.getElementById("sound"), heard = {}, auArg = { dist: 0, speed: 0, mode: "walk", amt: 0, biome: 0, reduce: reduce };
+  var sp = { panel: document.getElementById("sndpanel"), tune: document.getElementById("tune"), master: document.getElementById("sp-master"), masterT: document.getElementById("sp-master-t"), music: document.getElementById("sp-music"), mo: document.getElementById("sp-morning"), ev: document.getElementById("sp-evening"), mv: document.getElementById("sp-mvol") };
+  var pref = { music: "auto", last: "auto", tod: "morning", mv: 70 };
+  try { var pj = JSON.parse(localStorage.getItem("odyssey-snd2") || "null"); if (pj) for (var pk in pref) if (pj[pk] !== undefined) pref[pk] = pj[pk]; } catch (e) {}
+  function musicIsOn() { return pref.music !== "off"; }
+  function savePref() { try { localStorage.setItem("odyssey-snd2", JSON.stringify(pref)); } catch (e) {} }
+  function paintPrefs() {
+    sp.music.value = pref.music; sp.mv.value = pref.mv; sp.mo.setAttribute("aria-pressed", String(pref.tod === "morning")); sp.ev.setAttribute("aria-pressed", String(pref.tod === "evening")); document.documentElement.setAttribute("data-tod", pref.tod);
+    var on = musicIsOn(); soundBtn.setAttribute("aria-pressed", String(on)); soundBtn.setAttribute("aria-label", on ? "Music on. Turn music off" : "Music off. Turn music on");
+    sp.master.setAttribute("aria-pressed", String(on)); sp.masterT.textContent = on ? "Music is on. Tap to turn off" : "Music is off. Tap to turn on";
+  }
+  function applyPrefs() { if (!AU) return; AU.setTod(pref.tod); AU.setVol("music", pref.mv / 100); AU.setMusic(pref.music); }
+  /* must run inside a user gesture (also resumes iOS Safari's context in that same call) */
+  function dropGestureListeners() { ["pointerup", "touchend", "click", "keydown"].forEach(function (ev) { window.removeEventListener(ev, onGesture, true); }); }
+  function unlockAudio(startMusic) {
+    try {
+      if (!AU) { var AC = window.AudioContext || window.webkitAudioContext; if (!AC || !window.OdysseyAudio) return; AU = window.OdysseyAudio.create(new AC({ latencyHint: "interactive" }), { gentle: reduce }); window.__odysseyAudio = AU; AU.ctx.onstatechange = function () { if (AU.ctx.state === "running") dropGestureListeners(); }; AU.setTod(pref.tod); AU.setVol("music", pref.mv / 100); AU.setMusic(startMusic === false ? "off" : pref.music); }
+      AU.unlock(); unlocked = true; if (AU.ctx.state === "running") dropGestureListeners();
+    } catch (e) { AU = null; }
+  }
+  function onGesture(e) {
+    if (e.type === "keydown" && (e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.key === "Meta")) return;
+    var t = e.target, onToggle = t && t.closest && t.closest("#sound"), onM = e.type === "keydown" && (e.key === "m" || e.key === "M");
+    unlockAudio(!(onToggle || onM) ? true : false);
+    if (unlocked && (onToggle || onM)) AU.setMusic("off"); // the toggle handler below then decides
+  }
+  ["pointerup", "touchend", "click", "keydown"].forEach(function (ev) { window.addEventListener(ev, onGesture, true); });
+  /* scroll / wheel can't unlock audio in browsers, but try anyway so desktop wheel users get sound once any real gesture lands */
+  function setMusic(choice) {
+    if (choice !== "off") pref.last = choice; pref.music = choice; savePref(); paintPrefs();
+    if (AU && unlocked) AU.setMusic(choice);
+  }
+  function toggleMusic() { setMusic(musicIsOn() ? "off" : (pref.last && pref.last !== "off" ? pref.last : "auto")); if (unlocked && AU) AU.tap(); }
+  paintPrefs();
+  soundBtn.addEventListener("click", toggleMusic);
+  sp.master.addEventListener("click", toggleMusic);
+  function openPanel(o) { sp.panel.hidden = !o; sp.tune.setAttribute("aria-expanded", String(o)); if (o) sp.master.focus({ preventScroll: true }); else sp.tune.focus({ preventScroll: true }); }
+  sp.tune.addEventListener("click", function () { openPanel(sp.panel.hidden); });
+  document.getElementById("sp-close").addEventListener("click", function () { openPanel(false); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !sp.panel.hidden) openPanel(false); if ((e.key === "m" || e.key === "M") && !e.ctrlKey && !e.metaKey && !e.altKey && !/INPUT|SELECT|TEXTAREA/.test((e.target && e.target.tagName) || "")) toggleMusic(); });
+  document.addEventListener("pointerdown", function (e) { if (!sp.panel.hidden && !sp.panel.contains(e.target) && e.target !== sp.tune && !sp.tune.contains(e.target)) openPanel(false); }, true);
+  sp.music.addEventListener("change", function () { var c = sp.music.value; if (c === "morning" || c === "evening") pref.tod = c; setMusic(c); if (AU) AU.setTod(pref.tod); paintPrefs(); });
+  [sp.mo, sp.ev].forEach(function (b) { b.addEventListener("click", function () { pref.tod = b === sp.mo ? "morning" : "evening"; savePref(); paintPrefs(); if (AU) AU.setTod(pref.tod); }); });
+  sp.mv.addEventListener("input", function () { pref.mv = +sp.mv.value; if (AU) AU.setVol("music", pref.mv / 100); }); sp.mv.addEventListener("change", savePref);
+  document.addEventListener("click", function (e) { if (AU && unlocked && e.target.closest && e.target.closest("button,a") && !e.target.closest("#sound,#sp-master,.sndpanel")) AU.tap(); });
+  document.addEventListener("visibilitychange", function () { if (!AU) return; if (document.hidden) AU.suspend(); else AU.resume(); });
+  function stopSound(i) { var first = !heard[i]; heard[i] = 1; if (AU && unlocked) AU.stopReached(first); }
 
   /* ---------- input ---------- */
   var drive = 0, keyDown = {}, keyT = {};
@@ -551,7 +594,7 @@
     var here = near; if (here !== hereIdx) { badgeBtns.forEach(function (b, j) { b.classList.toggle("on", j <= reached); b.classList.toggle("here", j === here); if (j === here) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); }); hereIdx = here; }
     if (near !== shownCard) {
       if (shownCard >= 0) cards[shownCard].classList.remove("on");
-      if (near >= 0) { loadImg(near); loadImg(near + 1); cards[near].classList.add("on"); chime(); liveEl.textContent = STOPS[near].title; }
+      if (near >= 0) { loadImg(near); loadImg(near + 1); cards[near].classList.add("on"); stopSound(near); liveEl.textContent = STOPS[near].title; }
       shownCard = near;
     }
     var s = scrollNow(); if (s > 30) started();
@@ -578,6 +621,7 @@
     drawRider(cam, camV, now);
     drawLayer(FORE, cam);
     updateHud(cam, now);
+    if (unlocked) { var bw = biomeAt(cam); auArg.dist = dist; auArg.speed = camV; auArg.mode = modeAt(cam); auArg.amt = clamp(Math.abs(camV) / 160, 0, 1); auArg.biome = bw[2] > 0.5 ? bw[1] : bw[0]; AU.update(auArg); }
     var work = performance.now() - t0; workTimes.push(work); if (workTimes.length > 4000) workTimes.shift();
     if (work < 6) prewarm(cam, camV >= 0 ? 1 : -1);
     // quality governor: if frames are consistently heavy, render at a lower pixel ratio
