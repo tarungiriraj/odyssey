@@ -547,12 +547,15 @@
   function easeIO(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
   function next() { var x = anim ? worldAt(anim.to) : worldAt(scrollNow()), i; for (i = 0; i < N; i++) if (STOPX[i] > x + 40) break; goTo(Math.min(i, N - 1)); }
   function prev() { var x = anim ? worldAt(anim.to) : worldAt(scrollNow()), i; for (i = N - 1; i >= 0; i--) if (STOPX[i] < x - 40) break; goTo(i); }
-  ["wheel", "touchstart"].forEach(function (ev) { window.addEventListener(ev, function () { anim = null; started(); }, { passive: true }); });
+  window.addEventListener("wheel", function () { anim = null; started(); }, { passive: true });
+  window.addEventListener("touchstart", function () { anim = null; }, { passive: true }); /* a plain tap must stay a tap (it rides to stop 1); only a real swipe counts as intent */
+  window.addEventListener("touchmove", function () { started(); }, { passive: true });
   var FWD = { ArrowRight: 1, d: 1, D: 1, ArrowDown: 1 }, BACK = { ArrowLeft: -1, a: -1, A: -1, ArrowUp: -1 };
   window.addEventListener("keydown", function (e) {
     if (listOpen || e.metaKey || e.ctrlKey || e.altKey) return;
     var d = FWD[e.key] || BACK[e.key];
-    if (!d) { var m = { " ": next, PageDown: next, PageUp: prev, End: function () { goTo(N - 1); }, Home: function () { goTo(-1); } }[e.key]; if (m && !(e.key === " " && e.target.closest && e.target.closest("a,button"))) { e.preventDefault(); started(); m(); } return; }
+    if (!d) { if (e.key === "Enter" && !hasStarted && !(e.target.closest && e.target.closest("a,button"))) { e.preventDefault(); started(); next(); return; }
+    var m = { " ": next, PageDown: next, PageUp: prev, End: function () { goTo(N - 1); }, Home: function () { goTo(-1); } }[e.key]; if (m && !(e.key === " " && e.target.closest && e.target.closest("a,button"))) { e.preventDefault(); started(); m(); } return; }
     e.preventDefault(); anim = null; if (!keyDown[e.key]) { keyDown[e.key] = true; keyT[e.key] = performance.now(); } drive = d; started();
   });
   window.addEventListener("keyup", function (e) { var d = FWD[e.key] || BACK[e.key]; if (!d || !keyDown[e.key]) return; keyDown[e.key] = false; drive = 0; if (performance.now() - keyT[e.key] < 200) (d > 0 ? next : prev)(); });
@@ -585,7 +588,9 @@
   /* ---------- HUD state ---------- */
   var odoEl = document.getElementById("odo"), barEl = document.getElementById("bar"), introEl = document.getElementById("intro"), hintEl = document.getElementById("hint"), liveEl = document.getElementById("live");
   var shownOdo = -1, shownCard = -1, reached = -1, hasStarted = false, hereIdx = -2;
-  function started() { if (hasStarted) return; hasStarted = true; introEl.classList.add("gone"); }
+  function started() { if (hasStarted) return; hasStarted = true; introEl.classList.add("gone"); hintEl.classList.remove("wait"); }
+  /* the whole title screen is the tap target: audio unlock is the window-level gesture listener above, this starts the ride */
+  introEl.addEventListener("click", function (e) { if (hasStarted || (e.target.closest && e.target.closest("[data-open-list]"))) return; started(); next(); });
   function updateHud(cam, now) {
     var km = Math.round(cam * KM_PER_PX); if (km !== shownOdo) { shownOdo = km; odoEl.textContent = ("000" + km).slice(-4); }
     barEl.style.transform = "scaleX(" + (cam / STOPX[N - 1]).toFixed(4) + ")";
