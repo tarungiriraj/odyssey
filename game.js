@@ -297,7 +297,7 @@
   function drawSky(cam, t) {
     var top = bget(cam, "sky", 0), bot = bget(cam, "sky", 1), key = top + bot;
     if (key !== gradKey) { grad = ctx.createLinearGradient(0, 0, 0, GY * DPR); grad.addColorStop(0, top); grad.addColorStop(1, bot); gradKey = key; }
-    ctx.fillStyle = grad; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = grad; ctx.fillRect(0, 0, cv.width, Math.ceil((GY - 28 * S) * DPR));
     var night = bget(cam, "night");
     if (night > 0.05) { ctx.globalAlpha = night; var off = (cam * 0.02) % 512; for (var sx = -off; sx < W; sx += 512) ctx.drawImage(stars, Math.round(sx * DPR), 0, 512 * DPR, 300 * DPR); ctx.globalAlpha = 1; }
     var w = biomeAt(cam), k = w[2], cx = W * (portrait ? 0.76 : 0.74), cy = GY * (portrait ? 0.3 : 0.32), R = 28 * S;
@@ -559,7 +559,7 @@
   }
 
   /* ---------- main loop ---------- */
-  var cam = 0, camV = 0, last = 0, frameTimes = [], workTimes = [], slow = 0;
+  var cam = 0, camV = 0, last = 0, frameTimes = [], workTimes = [], slow = 0, ema = 16.7;
   window.__odyssey = { frames: frameTimes, work: workTimes, stops: STOPX, scrollFor: function (i) { return stopScroll(i); }, state: function () { return { cam: cam, dpr: DPR, S: S, shownCard: shownCard }; } };
   function frame(now) {
     requestAnimationFrame(frame);
@@ -581,13 +581,15 @@
     var work = performance.now() - t0; workTimes.push(work); if (workTimes.length > 4000) workTimes.shift();
     if (work < 6) prewarm(cam, camV >= 0 ? 1 : -1);
     // quality governor: if frames are consistently heavy, render at a lower pixel ratio
-    if (work > 12) slow++; else if (slow > 0) slow -= 0.5;
-    if (slow > 40 && dprCap > 1) { dprCap = dprCap > 1.5 ? 1.5 : 1; slow = 0; measure(); }
+    // judged on the real frame interval (includes raster + compositing), only while the page is in use
+    var iv = frameTimes.length ? frameTimes[frameTimes.length - 1] : 16.7;
+    if (iv < 250 && !document.hidden) { ema += (iv - ema) * 0.1; if (ema > 21) slow++; else slow = Math.max(0, slow - 2); }
+    if (slow > 45 && dprCap > 1) { dprCap = dprCap > 1.6 ? 1.5 : dprCap > 1.3 ? 1.25 : 1; slow = 0; ema = 16.7; measure(); }
   }
   function measure() {
     W = window.innerWidth; H = window.innerHeight; portrait = H > W * 1.1;
     DPR = Math.min(window.devicePixelRatio || 1, dprCap);
-    S = clamp(Math.min(H / 700, W / 420), 0.72, 1.5);
+    S = clamp(Math.min(H / 650, W / 420), 0.72, 1.5);
     GY = Math.round(H * (portrait ? 0.79 : 0.75));
     cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
     ROAD.th = (H - GY) / S - ROAD.top + 4; FORE.th = Math.max(10, (H - GY) / S - FORE.top + 4);
