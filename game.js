@@ -323,7 +323,7 @@
     ink(g, 2.2); rect(g, 56, 50, 8, 60, "#8A5A3A");
     rrect(g, 6, 6, 108, 50, 6); fs(g, PAPER); g.lineWidth = 2; g.strokeStyle = MAROON; rrect(g, 11, 11, 98, 40, 4); g.stroke();
     txt(g, STOPS[i].end ? "NEXT STOP" : "STOP 0" + (i + 1), 60, 21, "700 9px " + SANS, MAROON);
-    txt(g, STOPS[i].short.toUpperCase(), 60, 38, "700 15px " + SERIF, INK);
+    var lab = STOPS[i].short.toUpperCase(), fz = 15; g.font = "700 15px " + SERIF; var mw = g.measureText(lab).width; if (mw > 90) fz = 15 * 90 / mw; txt(g, lab, 60, 38, "700 " + fz.toFixed(1) + "px " + SERIF, INK);
     signCache[i] = c; return c;
   }
   function backOut(t) { var c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
