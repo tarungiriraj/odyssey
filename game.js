@@ -498,7 +498,8 @@
   }
   function applyPrefs() { if (!AU) return; AU.setTod(pref.tod); AU.setVol("music", pref.mv / 100); AU.setMusic(pref.music); }
   /* must run inside a user gesture (also resumes iOS Safari's context in that same call) */
-  function dropGestureListeners() { ["pointerup", "touchend", "click", "keydown"].forEach(function (ev) { window.removeEventListener(ev, onGesture, true); }); }
+  function dropGestureListeners() { /* kept on purpose: phones suspend/interrupt the context (lock, call, tab switch) and only a fresh tap can wake it, so the gesture listeners stay for the life of the page and onGesture returns early while the sound is running */ }
+  function soundRunning() { return !!(AU && unlocked && AU.ctx && AU.ctx.state === "running"); }
   function unlockAudio(startMusic) {
     try {
       if (!AU) { var AC = window.AudioContext || window.webkitAudioContext; if (!AC || !window.OdysseyAudio) return; AU = window.OdysseyAudio.create(new AC({ latencyHint: "interactive" }), { gentle: reduce }); window.__odysseyAudio = AU; AU.ctx.onstatechange = function () { if (AU.ctx.state === "running") dropGestureListeners(); }; AU.setTod(pref.tod); AU.setVol("music", pref.mv / 100); AU.setMusic(startMusic === false ? "off" : pref.music); }
@@ -506,12 +507,18 @@
     } catch (e) { AU = null; }
   }
   function onGesture(e) {
+    if (soundRunning()) return;
     if (e.type === "keydown" && (e.key === "Shift" || e.key === "Control" || e.key === "Alt" || e.key === "Meta")) return;
     var t = e.target, onToggle = t && t.closest && t.closest("#sound"), onM = e.type === "keydown" && (e.key === "m" || e.key === "M");
     unlockAudio(!(onToggle || onM) ? true : false);
     if (unlocked && (onToggle || onM)) AU.setMusic("off"); // the toggle handler below then decides
   }
   ["pointerup", "touchend", "click", "keydown"].forEach(function (ev) { window.addEventListener(ev, onGesture, true); });
+  /* "Tap for sound": browsers refuse sound until a real tap/click/key. A swipe or drag never counts, and iOS can interrupt the context later, so if the sound is not running a small pill asks for one tap (any tap anywhere unlocks it, then the pill leaves). Checked twice a second, and right away when the tab comes back. */
+  var nudgeEl = document.getElementById("sndnudge"), t0Load = Date.now();
+  function paintNudge() { if (!nudgeEl) return; var need = !soundRunning() && Date.now() - t0Load > 1800 && !document.hidden; if (nudgeEl.hidden === need) nudgeEl.hidden = !need; }
+  setInterval(paintNudge, 500);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) { if (AU && AU.ctx.state !== "running") { try { AU.resume(); } catch (e) {} } setTimeout(paintNudge, 400); } });
   /* scroll / wheel can't unlock audio in browsers, but try anyway so desktop wheel users get sound once any real gesture lands */
   function setMusic(choice) {
     if (choice !== "off") pref.last = choice; pref.music = choice; savePref(); paintPrefs();

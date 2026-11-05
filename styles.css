@@ -189,3 +189,7 @@ html[data-tod="evening"] #tint{background:rgba(196,92,70,.2)}
   .tl span,.tagline,.cue,.title-in::before{animation:none;opacity:1;transform:none}.title-in{animation:none}.cue i{animation:none}
   .intro{transition:opacity .3s linear}.intro.gone .title-wrap{transform:translateX(-50%)}
 }
+
+.sndnudge{position:fixed;z-index:30;left:50%;bottom:calc(18px + var(--safe-b,env(safe-area-inset-bottom,0px)));transform:translateX(-50%);background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:999px;box-shadow:3px 3px 0 var(--ink);padding:10px 18px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.sndnudge[hidden]{display:none}
+.sndnudge:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
